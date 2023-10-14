@@ -18,11 +18,23 @@ router.post('/',async (req,res)=> {
             message:'Could not find the user with the provided credentials'
         })
     }else{
-
+       req.session.userId = user.userId;
        res.status(200).json({user})
     }
     console.log(user);
 })
 
+router.get('/profile',async(req,res)=>{
+    try{
+        console.log('The user session is', req.session.userId);
+        let userId = req.session.userId;
+        let user = await User.findOne({
+            userId
+        });
+    } catch(e){
+        res.status(404).json({message: 'Could not validate user'})
+    }
+    
+});
 
 module.exports = router; 
