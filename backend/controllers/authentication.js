@@ -31,6 +31,9 @@ router.get('/profile',async(req,res)=>{
         let user = await User.findOne({
             userId
         });
+    
+        req.status(200).json(user);
+
     } catch(e){
         res.status(404).json({message: 'Could not validate user'})
     }
