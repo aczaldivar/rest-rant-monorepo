@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const db = require('../models');
 const bcrypt = require ('bcrypt');
+const jwt = require('json-web-token');
+
 
 const { User } =db;
 
@@ -18,11 +20,35 @@ router.post('/',async (req,res)=> {
             message:'Could not find the user with the provided credentials'
         })
     }else{
-
-       res.status(200).json({user})
+      const {value} = await jwt.encode(process.env.JWT_SECRET,{userId:user.userId})
+    
+       res.status(200).json({user,token:value})
     }
     console.log(user);
 })
 
+router.get('./profile',async (req,res)=>{
+    try{
+        const[authMethod, token] = req.headers.authorization.split('');
+       
+        if(authMethod === 'Bearer'){
+            const {value:{userId}} = await jwt.decode(process.env.JWT_SECRET,token);
+           
+            let user = await User.findOne({
+                 where:{
+                      userId
+                     }
+                 })
+            if(user){
+                 res.status(200).json(user)
+            }else{
+                 res.status(404).json({message:'user could not be found'})
+            }
+        }
+       
+    }catch(e){
+        res.status(500).json({message:'Server did an oopsie'})
+    }
+});
 
 module.exports = router; 
