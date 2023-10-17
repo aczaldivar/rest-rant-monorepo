@@ -25,11 +25,27 @@ function Navigation() {
 
     if (currentUser) {
         loginActions = (
+            <>
             <li style={{ float: 'right' }}>
                 Logged in as {currentUser.firstName} {currentUser.lastName}
-            </li>
-        )
+            </li> 
+            <li>
+            <button type='button'
+                style={{ float: 'right',marginRight:'20px' }}
+                onClick={()=>{
+                    debugger;
+                localStorage.removeItem('token');
+              window.location.reload();
+            }}>
+                Log out
+            </button>
+        </li>
+       </> 
+       )
     }
+
+
+
 
     return (
         <nav>
@@ -50,6 +66,7 @@ function Navigation() {
                     </a>
                 </li>
                 {loginActions}
+     
             </ul>
         </nav>
     )
