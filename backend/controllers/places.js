@@ -1,5 +1,6 @@
 const router = require('express').Router()
 const db = require("../models")
+const jwt= require ('json-web-token');
 
 const { Place, Comment, User } = db
 
@@ -94,22 +95,36 @@ router.post('/:placeId/comments', async (req, res) => {
         res.status(404).json({ message: `Could not find place with id "${placeId}"` })
     }
 
-    const author = await User.findOne({
-        where: { userId: req.body.authorId }
-    })
+    let currentUser;
+    try{
+        const[authMethod, token] = req.headers.authorization.split('');
+        if(authMethod=== 'Bearer'){
+            const result =await jwt.decode(process.env.JWT_SECRET,token);
+            const {userId} =result.value;
+            currentUser= await User.findOne({
+                where:{
+                    userId
+                }
+            });
+        }
+    }catch(e){
+        currentUser= null;
+    }
 
-    if (!author) {
-        res.status(404).json({ message: `Could not find author with id "${req.body.authorId}"` })
+
+    if (!currentUser) {
+       return res.status(404).json({ message: `Login in to leave a comment` })
     }
 
     const comment = await Comment.create({
         ...req.body,
+        authorId: currentUser.userId,
         placeId: placeId
     })
 
     res.send({
         ...comment.toJSON(),
-        author
+        author:currentUser
     })
 })
 

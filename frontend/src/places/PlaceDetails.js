@@ -51,18 +51,19 @@ function PlaceDetails() {
 		const response = await fetch(`http://localhost:5000/places/${place.placeId}/comments`, {
 			method: 'POST',
 			headers: {
+				'Authorization':`Bearer ${localStorage.getItem('token')}`,
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify(commentAttributes)
-		})
+		});
 
-		const comment = await response.json()
+		const comment = await response.json();
 
 		setPlace({
 			...place,
 			comments: [
-				...place.comments,
-				comment
+			...place.comments,
+			comment
 			]
 		})
 

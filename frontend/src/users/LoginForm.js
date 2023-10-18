@@ -30,7 +30,7 @@ async function handleSubmit(e) {
 
     console.log(data);
 
-    if (response.status==200){
+    if (response.status===200){
         setCurrentUser(data.user);
         console.log(data.token);
         localStorage.setItem('token', data.token);
